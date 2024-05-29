@@ -25,3 +25,5 @@ y por ultimo agegamos el ciclo para que este constantemente repadsando los valor
 
 aqui adjunto el link del video demostrativo de su funcionamiento.
 
+(https://youtu.be/U7AFG7PAjP8?si=R9ObWDucbje84-6o)
+

@@ -1,0 +1,70 @@
+
+#include <stdint.h>
+#include "stm32l053xx.h"
+
+int main(void)
+{
+    // CLK ENABLE
+    // ENABLE GPIOA CLK
+    RCC->IOPENR |= (1<<0);
+    // TIM2 ENABLE
+    RCC->APB1ENR |= (1<<0);
+
+    // Configure PA5, PA6, PA7 as output
+    GPIOA->MODER &= ~((3<<(2*5)) | (3<<(2*6)) | (3<<(2*7))); // Clear MODER bits for PA5, PA6, PA7
+    GPIOA->MODER |= ((1<<(2*5)) | (1<<(2*6)) | (1<<(2*7)));  // Set MODER bits for PA5, PA6, PA7 to output mode
+
+    // TIM22 config A 250ms  PA7
+    // Enable timer22
+    RCC->APB2ENR |= (1<<5);
+    // LOAD PRESCALER
+    TIM22->PSC = 1600 - 1;
+    // LOAD ARR
+    TIM22->ARR = 249 - 1; // DOWNCOUNTER
+    TIM22->CNT = 0;
+    // COUNTER ENABLE
+    TIM22->CR1 |= (1<<0);
+
+    // TIM21 config A 5000ms PA6
+    // Enable timer21
+    RCC->APB2ENR |= (1<<2);
+    // Load prescaler
+    TIM21->PSC = 1600 - 1;
+    // LOAD ARR
+    TIM21->ARR = 499 - 1;
+    TIM21->CNT = 0;
+    // COUNTER ENABLE
+    TIM21->CR1 |= (1<<0);
+
+    // TIM2 config A 1 SEGUNDO PA5
+    // Enable timer2
+    RCC->APB1ENR |= (1<<0);
+    // Load prescaler
+    TIM2->PSC = 1600 - 1;
+    // LOAD ARR
+    TIM2->ARR = 999 - 1;
+    // COUNT to 0
+    TIM2->CNT = 0;
+    // COUNTER ENABLE
+    TIM2->CR1 |= (1<<0);
+
+    while (1)
+    {
+        if (TIM2->SR & 0x00000001) // Check UIF == 1
+        {
+            TIM2->SR &= ~1; // CLEAR UIF
+            GPIOA->ODR ^= (1<<5); // Toggle PA5
+        }
+        if (TIM21->SR & 0x00000001)
+        {
+            TIM21->SR &= ~1; // CLEAR UIF
+            GPIOA->ODR ^= (1<<6); // Toggle PA6
+        }
+        if (TIM22->SR & 0x00000001)
+        {
+            TIM22->SR &= ~1; // CLEAR UIF
+            GPIOA->ODR ^= (1<<7); // Toggle PA7
+        }
+    }
+}
+
